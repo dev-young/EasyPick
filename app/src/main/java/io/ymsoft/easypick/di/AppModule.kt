@@ -39,7 +39,8 @@ object AppModule {
             addCandidate = AddCandidate(repository),
             addGroup = AddGroup(repository),
             deleteCandidate = DeleteCandidate(repository),
-            getGroups = GetGroups(repository)
+            getGroups = GetGroups(repository),
+            getGroup = GetGroup(repository)
         )
     }
 }
