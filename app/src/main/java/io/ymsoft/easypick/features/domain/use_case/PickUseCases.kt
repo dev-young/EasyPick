@@ -5,5 +5,6 @@ data class PickUseCases(
     val getGroup: GetGroup,
     val addGroup: AddGroup,
     val addCandidate: AddCandidate,
-    val deleteCandidate: DeleteCandidate
+    val deleteCandidate: DeleteCandidate,
+    val getCandidatesById: GetCandidatesById
 )

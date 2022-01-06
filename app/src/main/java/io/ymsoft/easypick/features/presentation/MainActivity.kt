@@ -13,6 +13,7 @@ import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import io.ymsoft.easypick.features.presentation.add_edit_group.AddEditGroupScreen
 import io.ymsoft.easypick.features.presentation.candi_groups.GroupsScreen
+import io.ymsoft.easypick.features.presentation.group_detail.GroupDetailScreen
 import io.ymsoft.easypick.ui.theme.EasyPickTheme
 
 @AndroidEntryPoint
@@ -43,6 +44,16 @@ class MainActivity : ComponentActivity() {
                         })
                     ) {
                         AddEditGroupScreen(navController)
+                    }
+
+                    composable(
+                        route = Screen.GroupDetailScreen.route + "?groupId={groupId}",
+                        arguments = listOf(navArgument(name = "groupId") {
+                            type = NavType.IntType
+                            defaultValue = -1
+                        })
+                    ) {
+                        GroupDetailScreen(navController)
                     }
 
 //                    composable(route = Screen.GroupScreen.route) {

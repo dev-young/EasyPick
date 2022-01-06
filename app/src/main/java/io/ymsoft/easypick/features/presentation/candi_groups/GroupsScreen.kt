@@ -35,11 +35,11 @@ fun GroupsScreen(
     val scope = rememberCoroutineScope()
 
 
-    HomeScaffold(navController = navController) {
+    HomeScaffold(navController = navController,) {
         Column {
             GroupList(state.groups, onItemClick = {
                 Log.i("onClick", "GroupsScreen: $it")
-
+                navController.navigate(Screen.GroupDetailScreen.route + "?groupId=${it.id}")
             }, onItemLongClick = {
                 Log.i("onLongClick", "GroupsScreen: $it")
                 navController.navigate(Screen.AddEditGroupScreen.route + "?groupId=${it.id}")

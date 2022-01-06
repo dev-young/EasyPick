@@ -27,7 +27,6 @@ fun BackBtnAppBar(title: String, onIconClick: (() -> Unit)? = null) {
             }) {
                 Icon(imageVector = Icons.Rounded.ArrowBackIos, contentDescription = "back")
             }
-
         }
     )
 }

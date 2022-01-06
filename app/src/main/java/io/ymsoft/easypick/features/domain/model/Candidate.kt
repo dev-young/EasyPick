@@ -2,7 +2,9 @@ package io.ymsoft.easypick.features.domain.model
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import java.util.*
 
 @Entity(
     foreignKeys = [ForeignKey(
@@ -14,8 +16,12 @@ import androidx.room.PrimaryKey
 )
 data class Candidate(
     var name: String,
-    val created: Long,
-    var content: String,
+    var content: String = "",
+    val created: Long = Date().time,
     val groupId: Int? = null,
     @PrimaryKey(autoGenerate = true) val id: Int? = null
-)
+) {
+    @Ignore var selected = false
+}
+
+class InvalidCandidateException(message: String): Exception(message)
