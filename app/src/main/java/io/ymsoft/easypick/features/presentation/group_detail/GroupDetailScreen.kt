@@ -1,7 +1,7 @@
 package io.ymsoft.easypick.features.presentation.group_detail
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -23,10 +23,10 @@ import io.ymsoft.easypick.features.presentation.group_detail.components.Candidat
 import io.ymsoft.easypick.features.presentation.group_detail.components.SwipeableSnackbarHost
 import io.ymsoft.easypick.features.presentation.noRippleClickable
 import io.ymsoft.easypick.ui.theme.EasyPickTheme
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@ExperimentalAnimationApi
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
@@ -68,10 +68,15 @@ fun GroupDetailScreen(
                     .verticalScroll(rememberScrollState())
             )
             Column(modifier = Modifier.fillMaxWidth()) {
-                Text(text = if (!isEditMode.value) "편집 모드" else "선택 모드", modifier = Modifier
-                    .noRippleClickable { vm.onEvent(GroupDetailEvent.ToggleMode) }
-                    .align(Alignment.End)
-                    .padding(16.dp))
+                AnimatedContent(
+                    targetState = isEditMode,
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text(text = if (!isEditMode.value) "편집 모드" else "선택 모드", modifier = Modifier
+                        .noRippleClickable { vm.onEvent(GroupDetailEvent.ToggleMode) }
+                        .padding(16.dp))
+                }
+
 
 
                 Row(
@@ -90,12 +95,15 @@ fun GroupDetailScreen(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    AnimatedVisibility(visible = isEditMode.value && candidatesState.selectedCount > 0) {
+                    AnimatedVisibility(
+                        visible = isEditMode.value && candidatesState.selectedCount > 0,
+                        enter = scaleIn() + fadeIn(), exit = scaleOut() + fadeOut()
+                    ) {
                         Text(text = "삭제", modifier = Modifier.noRippleClickable {
                             scope.launch {
                                 val res = scaffoldState.snackbarHostState.showSnackbar(
                                     "${candidatesState.selectedCount}개의 후보를 삭제하시겠습니까?",
-                                "삭제",
+                                    "삭제",
                                     duration = SnackbarDuration.Short
                                 )
                                 if (res == SnackbarResult.ActionPerformed) {
@@ -163,7 +171,7 @@ fun HomeScaffold(
                 navController?.navigateUp()
             })
         }, scaffoldState = scaffoldState,
-        snackbarHost = { SwipeableSnackbarHost(scaffoldState.snackbarHostState)}
+        snackbarHost = { SwipeableSnackbarHost(scaffoldState.snackbarHostState) }
     ) { content() }
 }
 
