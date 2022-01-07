@@ -9,4 +9,5 @@ sealed class GroupDetailEvent {
     object AddCandidate : GroupDetailEvent()
     object Choice : GroupDetailEvent()
     object ToggleSelectAll : GroupDetailEvent()
+    object DeleteSelected : GroupDetailEvent()
 }

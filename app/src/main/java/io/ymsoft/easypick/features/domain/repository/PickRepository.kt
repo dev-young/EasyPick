@@ -23,4 +23,6 @@ interface PickRepository {
     suspend fun insertCandidate(Candidate: Candidate)
 
     suspend fun deleteCandidate(Candidate: Candidate)
+
+    suspend fun deleteCandidates(candidates: Array<Candidate>)
 }

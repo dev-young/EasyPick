@@ -47,4 +47,8 @@ class PickRepositoryImpl(
     override suspend fun deleteCandidate(candidate: Candidate) {
         candiDao.deleteCandi(candidate)
     }
+
+    override suspend fun deleteCandidates(candidates: Array<Candidate>) {
+        candiDao.deleteCandi(candidates)
+    }
 }

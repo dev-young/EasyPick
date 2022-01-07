@@ -20,9 +20,12 @@ import io.ymsoft.easypick.features.domain.model.Candidate
 import io.ymsoft.easypick.features.domain.model.SelectableCandidate
 import io.ymsoft.easypick.features.presentation.components.BackBtnAppBar
 import io.ymsoft.easypick.features.presentation.group_detail.components.CandidateItem
+import io.ymsoft.easypick.features.presentation.group_detail.components.SwipeableSnackbarHost
 import io.ymsoft.easypick.features.presentation.noRippleClickable
 import io.ymsoft.easypick.ui.theme.EasyPickTheme
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
@@ -45,7 +48,7 @@ fun GroupDetailScreen(
                         scaffoldState.snackbarHostState.showSnackbar(
                             it.message,
                             actionLabel = "확인",
-                            duration = SnackbarDuration.Indefinite
+                            duration = SnackbarDuration.Indefinite,
                         )
                     } else scaffoldState.snackbarHostState.showSnackbar(it.message)
                 }
@@ -87,8 +90,20 @@ fun GroupDetailScreen(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    AnimatedVisibility(visible = isEditMode.value) {
-                        Text(text = "삭제", modifier = Modifier.noRippleClickable { })
+                    AnimatedVisibility(visible = isEditMode.value && candidatesState.selectedCount > 0) {
+                        Text(text = "삭제", modifier = Modifier.noRippleClickable {
+                            scope.launch {
+                                val res = scaffoldState.snackbarHostState.showSnackbar(
+                                    "${candidatesState.selectedCount}개의 후보를 삭제하시겠습니까?",
+                                "삭제",
+                                    duration = SnackbarDuration.Short
+                                )
+                                if (res == SnackbarResult.ActionPerformed) {
+                                    vm.onEvent(GroupDetailEvent.DeleteSelected)
+                                }
+
+                            }
+                        })
                     }
                 }
 
@@ -134,6 +149,7 @@ fun GroupDetailScreen(
 }
 
 
+@ExperimentalMaterialApi
 @Composable
 fun HomeScaffold(
     title: State<String> = mutableStateOf("그룹이름1"),
@@ -146,7 +162,8 @@ fun HomeScaffold(
             BackBtnAppBar(title = title.value, onIconClick = {
                 navController?.navigateUp()
             })
-        }, scaffoldState = scaffoldState
+        }, scaffoldState = scaffoldState,
+        snackbarHost = { SwipeableSnackbarHost(scaffoldState.snackbarHostState)}
     ) { content() }
 }
 

@@ -86,6 +86,13 @@ class GroupDetailViewModel @Inject constructor(
             is GroupDetailEvent.ToggleSelectAll -> {
                 selectAll(!candidatesState.value.isSelectedAll)
             }
+            GroupDetailEvent.DeleteSelected -> {
+                val target = candidatesState.value.list.filter { it.selected }.map { it.candi }.toTypedArray()
+                viewModelScope.launch(Dispatchers.IO) {
+                    pickUseCases.deleteCandidate.invoke(target)
+                    loadCandidates()
+                }
+            }
         }
     }
 

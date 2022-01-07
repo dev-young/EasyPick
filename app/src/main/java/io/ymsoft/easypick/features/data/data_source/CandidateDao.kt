@@ -24,4 +24,7 @@ interface CandidateDao {
 
     @Delete
     suspend fun deleteCandi(candi: Candidate)
+
+    @Delete
+    suspend fun deleteCandi(candidates: Array<Candidate>)
 }
