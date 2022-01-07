@@ -15,7 +15,10 @@ import io.ymsoft.easypick.features.domain.model.InvalidCandidateException
 import io.ymsoft.easypick.features.domain.model.SelectableCandidate
 import io.ymsoft.easypick.features.domain.use_case.PickUseCases
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -48,10 +51,14 @@ class GroupDetailViewModel @Inject constructor(
     init {
         savedStateHandle.get<Int>("groupId")?.let {
             if (it >= 0) {
-                pickUseCases.getGroupFlow.invoke(it).onEach {
-                    Timber.i(it.toString())
-                    _groupName.value = it.name
-                    groupId = it.id
+                pickUseCases.getGroupFlow(it).onEach { candiGroup ->
+                    candiGroup?.let { group ->
+                        Timber.i(group.toString())
+                        _groupName.value = group.name
+                        groupId = group.id
+                    } ?: kotlin.run {
+                        Timber.e("CandiGroup == null")
+                    }
                 }.launchIn(viewModelScope)
                 loadCandidates(it)
             }
@@ -168,7 +175,7 @@ class GroupDetailViewModel @Inject constructor(
         data class ShowSnackbar(val message: String = "", val cancelable: Boolean = false) :
             UiEvent()
 
-        object GroupDeleted: UiEvent()
+        object GroupDeleted : UiEvent()
 
     }
 }

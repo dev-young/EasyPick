@@ -72,7 +72,10 @@ fun GroupDetailScreen(
         },
         onDeleteClick = {
             scope.launch {
-                val r = scaffoldState.snackbarHostState.showSnackbar("${vm.groupName.value}를 삭제하시겠습니까?", "확인")
+                val r = scaffoldState.snackbarHostState.showSnackbar(
+                    "${vm.groupName.value}를 삭제하시겠습니까?",
+                    "확인"
+                )
                 if (r == SnackbarResult.ActionPerformed) {
                     vm.onEvent(GroupDetailEvent.DeleteGroup)
                 }
@@ -204,13 +207,17 @@ fun HomeScaffold(
                     }
                     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                         DropdownMenuItem(onClick = {
+                            showMenu = false
                             onEditClick()
                         }) {
                             Icon(Icons.Rounded.Edit, null)
                             Text(text = "수정", Modifier.padding(start = 4.dp))
                         }
 
-                        DropdownMenuItem(onClick = { onDeleteClick() }) {
+                        DropdownMenuItem(onClick = {
+                            showMenu = false
+                            onDeleteClick()
+                        }) {
                             Icon(Icons.Rounded.Delete, null)
                             Text(text = "삭제", Modifier.padding(start = 4.dp))
                         }
