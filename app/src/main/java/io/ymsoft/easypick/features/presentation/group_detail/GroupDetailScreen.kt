@@ -102,43 +102,45 @@ fun GroupDetailScreen(
                         .padding(16.dp))
                 }
 
+                AnimatedVisibility(visible = candidatesState.selectedCount > 0 || isEditMode.value) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
 
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp, start = 16.dp, end = 16.dp)
-
-                ) {
-                    Checkbox(checked = candidatesState.isSelectedAll, onCheckedChange = {
-                        vm.onEvent(GroupDetailEvent.ToggleSelectAll)
-                    })
-                    Text(
-                        text = "${candidatesState.selectedCount}",
-                        modifier = Modifier.padding(start = 6.dp)
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    AnimatedVisibility(
-                        visible = isEditMode.value && candidatesState.selectedCount > 0,
-                        enter = scaleIn() + fadeIn(), exit = scaleOut() + fadeOut()
                     ) {
-                        Text(text = "삭제", modifier = Modifier.noRippleClickable {
-                            scope.launch {
-                                val res = scaffoldState.snackbarHostState.showSnackbar(
-                                    "${candidatesState.selectedCount}개의 후보를 삭제하시겠습니까?",
-                                    "삭제",
-                                    duration = SnackbarDuration.Short
-                                )
-                                if (res == SnackbarResult.ActionPerformed) {
-                                    vm.onEvent(GroupDetailEvent.DeleteSelected)
-                                }
-
-                            }
+                        Checkbox(checked = candidatesState.isSelectedAll, onCheckedChange = {
+                            vm.onEvent(GroupDetailEvent.ToggleSelectAll)
                         })
+                        Text(
+                            text = "${candidatesState.selectedCount}",
+                            modifier = Modifier.padding(start = 6.dp)
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        AnimatedVisibility(
+                            visible = isEditMode.value && candidatesState.selectedCount > 0,
+                            enter = scaleIn() + fadeIn(), exit = scaleOut() + fadeOut()
+                        ) {
+                            Text(text = "삭제", modifier = Modifier.noRippleClickable {
+                                scope.launch {
+                                    val res = scaffoldState.snackbarHostState.showSnackbar(
+                                        "${candidatesState.selectedCount}개의 후보를 삭제하시겠습니까?",
+                                        "삭제",
+                                        duration = SnackbarDuration.Short
+                                    )
+                                    if (res == SnackbarResult.ActionPerformed) {
+                                        vm.onEvent(GroupDetailEvent.DeleteSelected)
+                                    }
+
+                                }
+                            })
+                        }
                     }
                 }
+
+
 
 
                 AnimatedVisibility(visible = !isEditMode.value) {
