@@ -42,7 +42,8 @@ object AppModule {
             getGroups = GetGroups(repository),
             getGroup = GetGroup(repository),
             getCandidatesById = GetCandidatesById(repository),
-            deleteGroup = DeleteGroup(repository)
+            deleteGroup = DeleteGroup(repository),
+            getGroupFlow = GetGroupFlow(repository)
         )
     }
 }

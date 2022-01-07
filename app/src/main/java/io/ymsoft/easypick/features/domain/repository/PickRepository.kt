@@ -9,6 +9,7 @@ interface PickRepository {
     fun getCandiGroups(): Flow<List<CandiGroup>>
 
     suspend fun getGroupById(groupId: Int): CandiGroup?
+    fun getGroupFlowById(groupId: Int): Flow<CandiGroup>
 
     suspend fun insertCandiGroup(group: CandiGroup)
 

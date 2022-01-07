@@ -20,6 +20,10 @@ class PickRepositoryImpl(
         return groupDao.getGroupById(groupId)
     }
 
+    override fun getGroupFlowById(groupId: Int): Flow<CandiGroup> {
+        return groupDao.getGroupFlowById(groupId)
+    }
+
     override suspend fun insertCandiGroup(group: CandiGroup) {
         groupDao.insertGroup(group)
     }

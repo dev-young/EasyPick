@@ -15,11 +15,9 @@ import io.ymsoft.easypick.features.domain.model.InvalidCandidateException
 import io.ymsoft.easypick.features.domain.model.SelectableCandidate
 import io.ymsoft.easypick.features.domain.use_case.PickUseCases
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -50,12 +48,11 @@ class GroupDetailViewModel @Inject constructor(
     init {
         savedStateHandle.get<Int>("groupId")?.let {
             if (it >= 0) {
-                viewModelScope.launch {
-                    pickUseCases.getGroup.invoke(it)?.let {
-                        _groupName.value = it.name
-                        groupId = it.id
-                    }
-                }
+                pickUseCases.getGroupFlow.invoke(it).onEach {
+                    Timber.i(it.toString())
+                    _groupName.value = it.name
+                    groupId = it.id
+                }.launchIn(viewModelScope)
                 loadCandidates(it)
             }
         }

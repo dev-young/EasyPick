@@ -13,6 +13,9 @@ interface CandiGroupDao {
     @Query("SELECT * FROM candigroup WHERE id = :id")
     suspend fun getGroupById(id: Int): CandiGroup?
 
+    @Query("SELECT * FROM candigroup WHERE id = :id")
+    fun getGroupFlowById(id: Int): Flow<CandiGroup>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertGroup(group: CandiGroup)
 
