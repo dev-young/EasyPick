@@ -17,6 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.accompanist.flowlayout.FlowRow
 import io.ymsoft.easypick.features.domain.model.Candidate
+import io.ymsoft.easypick.features.domain.model.SelectableCandidate
 import io.ymsoft.easypick.features.presentation.components.BackBtnAppBar
 import io.ymsoft.easypick.features.presentation.group_detail.components.CandidateItem
 import io.ymsoft.easypick.features.presentation.noRippleClickable
@@ -30,7 +31,7 @@ fun GroupDetailScreen(
     navController: NavController,
     vm: GroupDetailViewModel = hiltViewModel()
 ) {
-    val candis = vm.candiList.value
+    val candidatesState = vm.candidatesState.value
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     val title = vm.groupName
@@ -40,8 +41,12 @@ fun GroupDetailScreen(
         vm.eventFlow.collectLatest {
             when (it) {
                 is GroupDetailViewModel.UiEvent.ShowSnackbar -> {
-                    if(it.cancelable) {
-                        scaffoldState.snackbarHostState.showSnackbar(it.message, actionLabel = "확인")
+                    if (it.cancelable) {
+                        scaffoldState.snackbarHostState.showSnackbar(
+                            it.message,
+                            actionLabel = "확인",
+                            duration = SnackbarDuration.Indefinite
+                        )
                     } else scaffoldState.snackbarHostState.showSnackbar(it.message)
                 }
             }
@@ -51,8 +56,9 @@ fun GroupDetailScreen(
     HomeScaffold(title, navController = navController, scaffoldState = scaffoldState) {
         Column(verticalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxSize()) {
             CandidateList(
-                candies = candis, onItemClick = {
+                candies = candidatesState.list, onItemClick = {
                     Log.i("onClick", "GroupDetailScreen: $it")
+                    vm.onEvent(GroupDetailEvent.OnCandiClick(it))
                 }, modifier = Modifier
                     .weight(1f)
                     .fillMaxSize()
@@ -63,6 +69,28 @@ fun GroupDetailScreen(
                     .noRippleClickable { vm.onEvent(GroupDetailEvent.ToggleMode) }
                     .align(Alignment.End)
                     .padding(16.dp))
+
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp, start = 16.dp, end = 16.dp)
+
+                ) {
+                    Checkbox(checked = candidatesState.isSelectedAll, onCheckedChange = {
+                        vm.onEvent(GroupDetailEvent.ToggleSelectAll)
+                    })
+                    Text(
+                        text = "${candidatesState.selectedCount}",
+                        modifier = Modifier.padding(start = 6.dp)
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    AnimatedVisibility(visible = isEditMode.value) {
+                        Text(text = "삭제", modifier = Modifier.noRippleClickable { })
+                    }
+                }
 
 
                 AnimatedVisibility(visible = !isEditMode.value) {
@@ -126,15 +154,15 @@ fun HomeScaffold(
 @ExperimentalMaterialApi
 @Composable
 fun CandidateList(
-    candies: List<Candidate>,
-    onItemClick: ((item: Candidate) -> Unit)? = null,
-    onItemLongClick: ((item: Candidate) -> Unit)? = null,
+    candies: List<SelectableCandidate>,
+    onItemClick: ((item: SelectableCandidate) -> Unit)? = null,
+    onItemLongClick: ((item: SelectableCandidate) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     FlowRow(modifier = modifier) {
         candies.forEach { item ->
             CandidateItem(
-                candi = item, modifier = Modifier
+                item, modifier = Modifier
                     .combinedClickable(onClick = {
                         onItemClick?.invoke(item)
                     }, onLongClick = {
@@ -153,7 +181,7 @@ fun CandidateList(
 fun GroupPreview() {
     EasyPickTheme(true) {
         HomeScaffold {
-            val candies = (0..11).map { Candidate("후보$it") }
+            val candies = (0..11).map { Candidate("후보$it") }.map { SelectableCandidate(it) }
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -174,6 +202,24 @@ fun GroupPreview() {
                         .clickable { }
                         .align(Alignment.End)
                         .padding(horizontal = 16.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
+
+                    ) {
+                        Checkbox(checked = false, onCheckedChange = {
+
+                        })
+                        Text(text = "0", modifier = Modifier.padding(start = 6.dp))
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        AnimatedVisibility(visible = true) {
+                            Text(text = "삭제", modifier = Modifier.noRippleClickable { })
+                        }
+
+                    }
 
                     Button(
                         onClick = { },

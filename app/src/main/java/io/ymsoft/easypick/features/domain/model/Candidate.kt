@@ -20,8 +20,8 @@ data class Candidate(
     val created: Long = Date().time,
     val groupId: Int? = null,
     @PrimaryKey(autoGenerate = true) val id: Int? = null
-) {
-    @Ignore var selected = false
-}
+)
 
 class InvalidCandidateException(message: String): Exception(message)
+
+class SelectableCandidate(val candi:Candidate, var selected:Boolean = false)

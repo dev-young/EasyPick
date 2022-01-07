@@ -11,8 +11,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ymsoft.easypick.R
 import io.ymsoft.easypick.features.domain.model.Candidate
-import io.ymsoft.easypick.features.domain.model.InvalidCandiGroupException
 import io.ymsoft.easypick.features.domain.model.InvalidCandidateException
+import io.ymsoft.easypick.features.domain.model.SelectableCandidate
 import io.ymsoft.easypick.features.domain.use_case.PickUseCases
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.lang.IndexOutOfBoundsException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,8 +36,8 @@ class GroupDetailViewModel @Inject constructor(
     private val _isEditMode = mutableStateOf(false)
     val isEditMode: State<Boolean> = _isEditMode
 
-    private val _candiList = mutableStateOf(emptyList<Candidate>())
-    val candiList: State<List<Candidate>> = _candiList
+    private val _candidatesState = mutableStateOf(CandidatesState())
+    val candidatesState: State<CandidatesState> = _candidatesState
 
     private val _candiName = mutableStateOf("")
     val candiName: State<String> = _candiName
@@ -76,6 +75,17 @@ class GroupDetailViewModel @Inject constructor(
             is GroupDetailEvent.ChangeName -> {
                 _candiName.value = e.name
             }
+            is GroupDetailEvent.OnCandiClick -> {
+                e.item.selected = !e.item.selected
+                val count = candidatesState.value.selectedCount + if (e.item.selected) 1 else -1
+                _candidatesState.value = candidatesState.value.copy(
+                    selectedCount = count,
+                    isSelectedAll = count == candidatesState.value.list.size
+                )
+            }
+            is GroupDetailEvent.ToggleSelectAll -> {
+                selectAll(!candidatesState.value.isSelectedAll)
+            }
         }
     }
 
@@ -103,10 +113,13 @@ class GroupDetailViewModel @Inject constructor(
     private fun choiceCandidate(count: Int = 1) {
         viewModelScope.launch {
             try {
-                val choiced = candiList.value.shuffled().subList(0, count)
-                val str = choiced.joinToString { it.name }
+                val choiced = candidatesState.value.list.let {
+                    if (candidatesState.value.selectedCount == 0) it
+                    else it.filter { it.selected }
+                }.shuffled().subList(0, count)
+                val str = choiced.joinToString { it.candi.name }
                 _eventFlow.emit(UiEvent.ShowSnackbar(str, true))
-            } catch (e:IndexOutOfBoundsException) {
+            } catch (e: IndexOutOfBoundsException) {
                 _eventFlow.emit(UiEvent.ShowSnackbar("올바른 범위가 아닙니다."))
             }
 
@@ -115,14 +128,28 @@ class GroupDetailViewModel @Inject constructor(
 
     private fun loadCandidates(id: Int = groupId!!) {
         pickUseCases.getCandidatesById(id).onEach {
-            _candiList.value = it
+            val list = it.map { SelectableCandidate(it) }
+            _candidatesState.value = CandidatesState(list)
         }.launchIn(viewModelScope)
+    }
+
+    private fun selectAll(select: Boolean) {
+        val list = candidatesState.value.list.apply {
+            forEach {
+                it.selected = select
+            }
+        }
+        _candidatesState.value = candidatesState.value.copy(
+            selectedCount = if (select) list.size else 0,
+            isSelectedAll = select
+        )
     }
 
     private fun getString(@StringRes id: Int) = resources.getString(id)
 
     sealed class UiEvent {
-        data class ShowSnackbar(val message: String = "", val cancelable:Boolean = false) : UiEvent()
+        data class ShowSnackbar(val message: String = "", val cancelable: Boolean = false) :
+            UiEvent()
 
     }
 }
