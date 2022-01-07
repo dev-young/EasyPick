@@ -94,10 +94,19 @@ fun GroupDetailScreen(
             )
             Column(modifier = Modifier.fillMaxWidth()) {
                 AnimatedContent(
-                    targetState = isEditMode,
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Text(text = if (!isEditMode.value) "편집 모드" else "선택 모드", modifier = Modifier
+                    targetState = isEditMode.value,
+                    modifier = Modifier.align(Alignment.End),
+                    transitionSpec = {
+                        if (targetState) {
+                            slideInVertically { height -> height } + fadeIn() with
+                                    slideOutVertically { height -> -height }
+                        } else {
+                            slideInVertically { height -> -height } + fadeIn() with
+                                    slideOutVertically { height -> height } + fadeOut()
+                        }.using(SizeTransform(clip = true))
+                    }
+                ) { b ->
+                    Text(text = if (!b) "편집 모드" else "선택 모드", modifier = Modifier
                         .noRippleClickable { vm.onEvent(GroupDetailEvent.ToggleMode) }
                         .padding(16.dp))
                 }
