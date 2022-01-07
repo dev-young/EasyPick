@@ -7,6 +7,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +22,7 @@ import androidx.navigation.NavController
 import com.google.accompanist.flowlayout.FlowRow
 import io.ymsoft.easypick.features.domain.model.Candidate
 import io.ymsoft.easypick.features.domain.model.SelectableCandidate
+import io.ymsoft.easypick.features.presentation.Screen
 import io.ymsoft.easypick.features.presentation.components.BackBtnAppBar
 import io.ymsoft.easypick.features.presentation.group_detail.components.CandidateItem
 import io.ymsoft.easypick.features.presentation.group_detail.components.SwipeableSnackbarHost
@@ -52,11 +57,28 @@ fun GroupDetailScreen(
                         )
                     } else scaffoldState.snackbarHostState.showSnackbar(it.message)
                 }
+                GroupDetailViewModel.UiEvent.GroupDeleted -> {
+                    navController.navigateUp()
+                }
             }
         }
     }
 
-    HomeScaffold(title, navController = navController, scaffoldState = scaffoldState) {
+    HomeScaffold(
+        title, navController = navController,
+        scaffoldState = scaffoldState,
+        onEditClick = {
+            navController.navigate(Screen.AddEditGroupScreen.route + "?groupId=${vm.groupId}")
+        },
+        onDeleteClick = {
+            scope.launch {
+                val r = scaffoldState.snackbarHostState.showSnackbar("${vm.groupName.value}를 삭제하시겠습니까?", "확인")
+                if (r == SnackbarResult.ActionPerformed) {
+                    vm.onEvent(GroupDetailEvent.DeleteGroup)
+                }
+            }
+        }
+    ) {
         Column(verticalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxSize()) {
             CandidateList(
                 candies = candidatesState.list, onItemClick = {
@@ -163,14 +185,39 @@ fun HomeScaffold(
     title: State<String> = mutableStateOf("그룹이름1"),
     navController: NavController? = null,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {},
     content: @Composable () -> Unit
 ) {
     Scaffold(
         topBar = {
-            BackBtnAppBar(title = title.value, onIconClick = {
-                navController?.navigateUp()
-            })
-        }, scaffoldState = scaffoldState,
+            var showMenu by remember { mutableStateOf(false) }
+
+            BackBtnAppBar(
+                title = title.value,
+                onIconClick = {
+                    navController?.navigateUp()
+                },
+                actions = {
+                    IconButton(onClick = { showMenu = !showMenu }) {
+                        Icon(Icons.Rounded.MoreVert, null)
+                    }
+                    DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                        DropdownMenuItem(onClick = {
+                            onEditClick()
+                        }) {
+                            Icon(Icons.Rounded.Edit, null)
+                            Text(text = "수정", Modifier.padding(start = 4.dp))
+                        }
+
+                        DropdownMenuItem(onClick = { onDeleteClick() }) {
+                            Icon(Icons.Rounded.Delete, null)
+                            Text(text = "삭제", Modifier.padding(start = 4.dp))
+                        }
+                    }
+                })
+        },
+        scaffoldState = scaffoldState,
         snackbarHost = { SwipeableSnackbarHost(scaffoldState.snackbarHostState) }
     ) { content() }
 }

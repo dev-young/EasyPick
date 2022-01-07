@@ -28,6 +28,10 @@ class PickRepositoryImpl(
         groupDao.deleteGroup(group)
     }
 
+    override suspend fun deleteCandiGroup(groupId: Int) {
+        groupDao.deleteGroup(groupId)
+    }
+
     override fun getCandidates(): Flow<List<Candidate>> {
         return candiDao.getCandidates()
     }

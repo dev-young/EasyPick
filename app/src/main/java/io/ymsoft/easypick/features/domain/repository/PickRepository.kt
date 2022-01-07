@@ -14,6 +14,8 @@ interface PickRepository {
 
     suspend fun deleteCandiGroup(group: CandiGroup)
 
+    suspend fun deleteCandiGroup(groupId: Int)
+
     fun getCandidates(): Flow<List<Candidate>>
 
     fun getCandidates(groupId: Int): Flow<List<Candidate>>

@@ -63,13 +63,13 @@ class GroupDetailViewModel @Inject constructor(
 
     fun onEvent(e: GroupDetailEvent) {
         when (e) {
-            is GroupDetailEvent.ToggleMode -> {
+            GroupDetailEvent.ToggleMode -> {
                 _isEditMode.value = !_isEditMode.value
             }
-            is GroupDetailEvent.AddCandidate -> {
+            GroupDetailEvent.AddCandidate -> {
                 addCandidate()
             }
-            is GroupDetailEvent.Choice -> {
+            GroupDetailEvent.Choice -> {
                 choiceCandidate()
             }
             is GroupDetailEvent.ChangeName -> {
@@ -83,15 +83,28 @@ class GroupDetailViewModel @Inject constructor(
                     isSelectedAll = count == candidatesState.value.list.size
                 )
             }
-            is GroupDetailEvent.ToggleSelectAll -> {
+            GroupDetailEvent.ToggleSelectAll -> {
                 selectAll(!candidatesState.value.isSelectedAll)
             }
             GroupDetailEvent.DeleteSelected -> {
-                val target = candidatesState.value.list.filter { it.selected }.map { it.candi }.toTypedArray()
+                val target = candidatesState.value.list.filter { it.selected }.map { it.candi }
+                    .toTypedArray()
                 viewModelScope.launch(Dispatchers.IO) {
                     pickUseCases.deleteCandidate.invoke(target)
                     loadCandidates()
                 }
+            }
+            GroupDetailEvent.DeleteGroup -> {
+                deleteGroup()
+            }
+        }
+    }
+
+    private fun deleteGroup() {
+        groupId?.let {
+            viewModelScope.launch(Dispatchers.IO) {
+                pickUseCases.deleteGroup(it)
+                _eventFlow.emit(UiEvent.GroupDeleted)
             }
         }
     }
@@ -157,6 +170,8 @@ class GroupDetailViewModel @Inject constructor(
     sealed class UiEvent {
         data class ShowSnackbar(val message: String = "", val cancelable: Boolean = false) :
             UiEvent()
+
+        object GroupDeleted: UiEvent()
 
     }
 }

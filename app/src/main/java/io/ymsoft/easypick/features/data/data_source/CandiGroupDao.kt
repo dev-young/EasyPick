@@ -18,4 +18,7 @@ interface CandiGroupDao {
 
     @Delete
     suspend fun deleteGroup(group: CandiGroup)
+
+    @Query("DELETE FROM candigroup WHERE id = :groupId")
+    suspend fun deleteGroup(groupId: Int)
 }

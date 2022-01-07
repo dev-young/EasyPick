@@ -41,7 +41,8 @@ object AppModule {
             deleteCandidate = DeleteCandidate(repository),
             getGroups = GetGroups(repository),
             getGroup = GetGroup(repository),
-            getCandidatesById = GetCandidatesById(repository)
+            getCandidatesById = GetCandidatesById(repository),
+            deleteGroup = DeleteGroup(repository)
         )
     }
 }
