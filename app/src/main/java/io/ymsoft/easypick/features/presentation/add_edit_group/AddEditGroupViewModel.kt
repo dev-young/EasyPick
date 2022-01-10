@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,16 +58,20 @@ class AddEditGroupViewModel @Inject constructor(
                 _groupName.value = e.name
             }
             is AddEditGroupEvent.Save -> {
-                Log.i("TAG", "onEvent: ${groupName.value} 저장!")
+                Timber.i("onEvent: " + groupName.value + " 저장!")
                 viewModelScope.launch {
                     launch(Dispatchers.IO) {
                         try {
-                            pickUseCases.addGroup.invoke(
-                                CandiGroup(
-                                    id = groupId,
-                                    name = groupName.value
-                                )
+                            val group = CandiGroup(
+                                id = groupId,
+                                name = groupName.value
                             )
+                            if (groupId == null) {
+                                pickUseCases.addGroup(group)
+                            } else {
+                                pickUseCases.updateGroup(group)
+                            }
+
                             _eventFlow.emit(UiEvent.SaveGroup)
                         } catch (e: InvalidCandiGroupException) {
                             e.printStackTrace()

@@ -13,6 +13,8 @@ interface PickRepository {
 
     suspend fun insertCandiGroup(group: CandiGroup)
 
+    suspend fun updateCandiGroup(group: CandiGroup)
+
     suspend fun deleteCandiGroup(group: CandiGroup)
 
     suspend fun deleteCandiGroup(groupId: Int)

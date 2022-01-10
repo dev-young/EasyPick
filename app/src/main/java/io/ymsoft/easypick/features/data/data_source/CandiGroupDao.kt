@@ -1,6 +1,7 @@
 package io.ymsoft.easypick.features.data.data_source
 
 import androidx.room.*
+import androidx.room.OnConflictStrategy.FAIL
 import io.ymsoft.easypick.features.domain.model.CandiGroup
 import kotlinx.coroutines.flow.Flow
 
@@ -18,6 +19,9 @@ interface CandiGroupDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertGroup(group: CandiGroup)
+
+    @Update
+    suspend fun updateGroup(group: CandiGroup)
 
     @Delete
     suspend fun deleteGroup(group: CandiGroup)

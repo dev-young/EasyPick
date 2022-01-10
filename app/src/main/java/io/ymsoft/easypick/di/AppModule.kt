@@ -43,7 +43,8 @@ object AppModule {
             getGroup = GetGroup(repository),
             getCandidatesById = GetCandidatesById(repository),
             deleteGroup = DeleteGroup(repository),
-            getGroupFlow = GetGroupFlow(repository)
+            getGroupFlow = GetGroupFlow(repository),
+            updateGroup = UpdateGroup(repository)
         )
     }
 }

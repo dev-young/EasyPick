@@ -28,6 +28,10 @@ class PickRepositoryImpl(
         groupDao.insertGroup(group)
     }
 
+    override suspend fun updateCandiGroup(group: CandiGroup) {
+        groupDao.updateGroup(group)
+    }
+
     override suspend fun deleteCandiGroup(group: CandiGroup) {
         groupDao.deleteGroup(group)
     }
