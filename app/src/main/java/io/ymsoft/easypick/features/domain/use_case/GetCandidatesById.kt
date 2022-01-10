@@ -7,7 +7,7 @@ import io.ymsoft.easypick.features.domain.repository.PickRepository
 import kotlinx.coroutines.flow.Flow
 
 class GetCandidatesById(private val repo: PickRepository) {
-    operator fun invoke(groupId:Int): Flow<List<Candidate>> {
+    operator fun invoke(groupId:Long): Flow<List<Candidate>> {
         return repo.getCandidates(groupId)
     }
 }

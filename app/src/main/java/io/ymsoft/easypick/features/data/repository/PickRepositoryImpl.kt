@@ -16,11 +16,11 @@ class PickRepositoryImpl(
         return groupDao.getGroups()
     }
 
-    override suspend fun getGroupById(groupId: Int): CandiGroup? {
+    override suspend fun getGroupById(groupId: Long): CandiGroup? {
         return groupDao.getGroupById(groupId)
     }
 
-    override fun getGroupFlowById(groupId: Int): Flow<CandiGroup> {
+    override fun getGroupFlowById(groupId: Long): Flow<CandiGroup> {
         return groupDao.getGroupFlowById(groupId)
     }
 
@@ -36,7 +36,7 @@ class PickRepositoryImpl(
         groupDao.deleteGroup(group)
     }
 
-    override suspend fun deleteCandiGroup(groupId: Int) {
+    override suspend fun deleteCandiGroup(groupId: Long) {
         groupDao.deleteGroup(groupId)
     }
 
@@ -44,7 +44,7 @@ class PickRepositoryImpl(
         return candiDao.getCandidates()
     }
 
-    override fun getCandidates(groupId: Int): Flow<List<Candidate>> {
+    override fun getCandidates(groupId: Long): Flow<List<Candidate>> {
         return candiDao.getCandidatesByGroup(groupId)
     }
 

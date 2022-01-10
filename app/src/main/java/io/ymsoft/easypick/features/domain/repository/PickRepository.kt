@@ -8,8 +8,8 @@ interface PickRepository {
 
     fun getCandiGroups(): Flow<List<CandiGroup>>
 
-    suspend fun getGroupById(groupId: Int): CandiGroup?
-    fun getGroupFlowById(groupId: Int): Flow<CandiGroup>
+    suspend fun getGroupById(groupId: Long): CandiGroup?
+    fun getGroupFlowById(groupId: Long): Flow<CandiGroup>
 
     suspend fun insertCandiGroup(group: CandiGroup)
 
@@ -17,11 +17,11 @@ interface PickRepository {
 
     suspend fun deleteCandiGroup(group: CandiGroup)
 
-    suspend fun deleteCandiGroup(groupId: Int)
+    suspend fun deleteCandiGroup(groupId: Long)
 
     fun getCandidates(): Flow<List<Candidate>>
 
-    fun getCandidates(groupId: Int): Flow<List<Candidate>>
+    fun getCandidates(groupId: Long): Flow<List<Candidate>>
 
     suspend fun getCandidateById(id: Int): Candidate?
 

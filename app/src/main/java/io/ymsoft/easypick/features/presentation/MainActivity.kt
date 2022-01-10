@@ -41,8 +41,8 @@ class MainActivity : ComponentActivity() {
                     composable(
                         route = Screen.AddEditGroupScreen.route + "?groupId={groupId}",
                         arguments = listOf(navArgument(name = "groupId") {
-                            type = NavType.IntType
-                            defaultValue = -1
+                            type = NavType.LongType
+                            defaultValue = -1L
                         })
                     ) {
                         AddEditGroupScreen(navController)
@@ -51,8 +51,8 @@ class MainActivity : ComponentActivity() {
                     composable(
                         route = Screen.GroupDetailScreen.route + "?groupId={groupId}",
                         arguments = listOf(navArgument(name = "groupId") {
-                            type = NavType.IntType
-                            defaultValue = -1
+                            type = NavType.LongType
+                            defaultValue = -1L
                         })
                     ) {
                         GroupDetailScreen(navController)

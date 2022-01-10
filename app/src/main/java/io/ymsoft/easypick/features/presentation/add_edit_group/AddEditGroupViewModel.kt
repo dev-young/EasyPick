@@ -33,13 +33,13 @@ class AddEditGroupViewModel @Inject constructor(
     private val _isEditMode = mutableStateOf(false)
     val isEditMode: State<Boolean> = _isEditMode
 
-    var groupId: Int? = null
+    var groupId: Long? = null
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
     init {
-        savedStateHandle.get<Int>("groupId")?.let {
+        savedStateHandle.get<Long>("groupId")?.let {
             if (it >= 0) {
                 viewModelScope.launch {
                     pickUseCases.getGroup.invoke(it)?.let {
