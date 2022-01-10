@@ -11,10 +11,10 @@ interface CandiGroupDao {
     fun getGroups(): Flow<List<CandiGroup>>
 
     @Query("SELECT * FROM candigroup WHERE id = :id")
-    suspend fun getGroupById(id: Int): CandiGroup?
+    suspend fun getGroupById(id: Long): CandiGroup?
 
     @Query("SELECT * FROM candigroup WHERE id = :id")
-    fun getGroupFlowById(id: Int): Flow<CandiGroup>
+    fun getGroupFlowById(id: Long): Flow<CandiGroup>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertGroup(group: CandiGroup)
@@ -23,5 +23,5 @@ interface CandiGroupDao {
     suspend fun deleteGroup(group: CandiGroup)
 
     @Query("DELETE FROM candigroup WHERE id = :groupId")
-    suspend fun deleteGroup(groupId: Int)
+    suspend fun deleteGroup(groupId: Long)
 }

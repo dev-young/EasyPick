@@ -6,7 +6,7 @@ import io.ymsoft.easypick.features.domain.repository.PickRepository
 import kotlinx.coroutines.flow.Flow
 
 class GetGroup(private val repo: PickRepository) {
-    suspend operator fun invoke(id:Int): CandiGroup? {
+    suspend operator fun invoke(id:Long): CandiGroup? {
         return repo.getGroupById(groupId = id)
     }
 }

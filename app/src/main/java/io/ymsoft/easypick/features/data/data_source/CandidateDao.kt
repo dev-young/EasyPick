@@ -14,7 +14,7 @@ interface CandidateDao {
     fun getCandidates(): Flow<List<Candidate>>
 
     @Query("SELECT * FROM candidate WHERE groupId = :groupId")
-    fun getCandidatesByGroup(groupId: Int): Flow<List<Candidate>>
+    fun getCandidatesByGroup(groupId: Long): Flow<List<Candidate>>
 
     @Query("SELECT * FROM candidate WHERE id = :id")
     suspend fun getCandidatesById(id: Int): Candidate?

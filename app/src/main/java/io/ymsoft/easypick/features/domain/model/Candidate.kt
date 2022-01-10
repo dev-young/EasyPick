@@ -1,9 +1,6 @@
 package io.ymsoft.easypick.features.domain.model
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Ignore
-import androidx.room.PrimaryKey
+import androidx.room.*
 import java.util.*
 
 @Entity(
@@ -18,7 +15,7 @@ data class Candidate(
     var name: String,
     var content: String = "",
     val created: Long = Date().time,
-    val groupId: Int? = null,
+    val groupId: Long? = null,
     @PrimaryKey(autoGenerate = true) val id: Int? = null
 )
 

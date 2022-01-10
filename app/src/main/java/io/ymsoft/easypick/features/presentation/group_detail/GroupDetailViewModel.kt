@@ -43,13 +43,13 @@ class GroupDetailViewModel @Inject constructor(
     private val _candiName = mutableStateOf("")
     val candiName: State<String> = _candiName
 
-    var groupId: Int? = null
+    var groupId: Long? = null
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
     init {
-        savedStateHandle.get<Int>("groupId")?.let {
+        savedStateHandle.get<Long>("groupId")?.let {
             if (it >= 0) {
                 pickUseCases.getGroupFlow(it).onEach { candiGroup ->
                     candiGroup?.let { group ->
@@ -150,7 +150,7 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
-    private fun loadCandidates(id: Int = groupId!!) {
+    private fun loadCandidates(id: Long = groupId!!) {
         pickUseCases.getCandidatesById(id).onEach {
             val list = it.map { SelectableCandidate(it) }
             _candidatesState.value = CandidatesState(list)
