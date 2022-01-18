@@ -9,7 +9,6 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -33,8 +32,11 @@ fun CandidateItem(
         modifier = Modifier
             .padding(vertical = 8.dp, horizontal = 16.dp),
 
-        border = if (sCandi.selected) BorderStroke(4.dp, color = MaterialTheme.colors.secondary) else null,
-        backgroundColor = MaterialTheme.colors.primaryVariant,
+        border = if (sCandi.selected) BorderStroke(
+            4.dp,
+            color = MaterialTheme.colors.secondary
+        ) else null,
+        backgroundColor = if (sCandi.pickAnim.value) MaterialTheme.colors.secondary else MaterialTheme.colors.primaryVariant,
         elevation = 4.dp,
     ) {
         Column(modifier = modifier.padding(8.dp)) {

@@ -1,7 +1,6 @@
 package io.ymsoft.easypick.features.presentation.group_detail
 
 import android.app.Application
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +14,8 @@ import io.ymsoft.easypick.features.domain.model.InvalidCandidateException
 import io.ymsoft.easypick.features.domain.model.SelectableCandidate
 import io.ymsoft.easypick.features.domain.use_case.PickUseCases
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.random.Random
 
 @HiltViewModel
 class GroupDetailViewModel @Inject constructor(
@@ -114,13 +116,13 @@ class GroupDetailViewModel @Inject constructor(
     }
 
     private fun addCandidate() {
-        Log.i("TAG", "onEvent: ${candiName.value} 저장 시작!")
+        Timber.i("onEvent: " + candiName.value + " 저장 시작!")
         viewModelScope.launch {
             launch(Dispatchers.IO) {
                 try {
                     val candi = Candidate(name = candiName.value, groupId = groupId)
                     pickUseCases.addCandidate(candi)
-                    Log.i("TAG", "onEvent: $candi 저장 성공!")
+                    Timber.i("onEvent: $candi 저장 성공!")
                     loadCandidates()
                     _candiName.value = ""
                 } catch (e: InvalidCandidateException) {
@@ -137,17 +139,60 @@ class GroupDetailViewModel @Inject constructor(
     private fun choiceCandidate(count: Int = 1) {
         viewModelScope.launch {
             try {
-                val choiced = candidatesState.value.list.let {
+                val filtered = candidatesState.value.list.let {
                     if (candidatesState.value.selectedCount == 0) it
                     else it.filter { it.selected }
-                }.shuffled().subList(0, count)
-                val str = choiced.joinToString { it.candi.name }
-                _eventFlow.emit(UiEvent.ShowSnackbar(str, true))
+                }
+
+                if (count == 1) {
+                    choiceWithAnimation(filtered)
+                } else {
+                    val choiced = filtered.shuffled().subList(0, count)
+                    val str = choiced.joinToString { it.candi.name }
+                    _eventFlow.emit(UiEvent.ShowSnackbar(str, true))
+                }
             } catch (e: IndexOutOfBoundsException) {
                 _eventFlow.emit(UiEvent.ShowSnackbar("올바른 범위가 아닙니다."))
             }
 
         }
+    }
+
+    private var choiceAnimationJob: Job? = null
+    private suspend fun choiceWithAnimation(filtered: List<SelectableCandidate>) {
+        choiceAnimationJob?.cancel()
+        _candidatesState.value.list.forEach { it.pickAnim.value = false }
+        if (filtered.isEmpty()) throw ArrayIndexOutOfBoundsException()
+        val targetIdx = Random.nextInt(filtered.size)
+        var currentAnimTarget: SelectableCandidate? = null
+        var idx = 0
+        Timber.i("target: ${filtered[(targetIdx + 19) % filtered.size].candi}")
+
+        fun changeTarget() {
+            currentAnimTarget?.pickAnim?.value = false
+            currentAnimTarget = filtered[idx % filtered.size]
+            currentAnimTarget!!.pickAnim.value = true
+            idx++
+        }
+        choiceAnimationJob = viewModelScope.launch {
+            repeat((filtered.size * 3) + targetIdx) {
+                delay(20L)
+                changeTarget()
+            }
+
+            var d = 20.0
+            for (i in 1..20) {
+                d *= 1.205
+                delay(d.toLong())
+//            Timber.i("$i  $d")
+                changeTarget()
+            }
+            delay(500)
+            _eventFlow.emit(UiEvent.ShowSnackbar(currentAnimTarget?.candi?.name ?: "null", true))
+            delay(1000)
+            currentAnimTarget?.pickAnim?.value = false
+        }
+
     }
 
     private fun loadCandidates(id: Long = groupId!!) {
@@ -158,10 +203,8 @@ class GroupDetailViewModel @Inject constructor(
     }
 
     private fun selectAll(select: Boolean) {
-        val list = candidatesState.value.list.apply {
-            forEach {
-                it.selected = select
-            }
+        val list = candidatesState.value.list.onEach {
+            it.selected = select
         }
         _candidatesState.value = candidatesState.value.copy(
             selectedCount = if (select) list.size else 0,
@@ -172,6 +215,8 @@ class GroupDetailViewModel @Inject constructor(
     private fun getString(@StringRes id: Int) = resources.getString(id)
 
     sealed class UiEvent {
+        data class ShowPickResult(val message: String = "") : UiEvent()
+
         data class ShowSnackbar(val message: String = "", val cancelable: Boolean = false) :
             UiEvent()
 
