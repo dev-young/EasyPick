@@ -103,6 +103,9 @@ class GroupDetailViewModel @Inject constructor(
             GroupDetailEvent.DeleteGroup -> {
                 deleteGroup()
             }
+            GroupDetailEvent.ResultDismissed -> {
+
+            }
         }
     }
 

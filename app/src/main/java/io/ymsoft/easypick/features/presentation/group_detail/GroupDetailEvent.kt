@@ -11,4 +11,5 @@ sealed class GroupDetailEvent {
     object ToggleSelectAll : GroupDetailEvent()
     object DeleteSelected : GroupDetailEvent()
     object DeleteGroup : GroupDetailEvent()
+    object ResultDismissed : GroupDetailEvent()
 }
